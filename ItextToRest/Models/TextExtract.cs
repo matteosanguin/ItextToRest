@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace ItextToRest.Models
 {
-    public class PdfApiRegexModel
+    public class TextExtractModel
     {
-        public String PdfSource { get; set; }
-        public String PdfPattern { get; set; }
+        public String Source { get; set; }
     }
 }

@@ -16,31 +16,31 @@ namespace ItextToRest.Controllers
         /// <summary>
         /// Extract Pages From Pdf  --- You Can Use single pages , list of pages or Page Range or any combination of : 1 or 1,2,3,4 or 1-4,5-9 or combination of  1,5,8,9-15,6-30 
         /// </summary>
-        /// <param name="pdfApiMergeModel"></param>
+        /// <param name="mergeModel"></param>
         /// <returns></returns>
-        [HttpPost("PdfExtract")]
-        public ActionResult<byte[]> PdfExtract([FromBody] PdfApiMergeModel pdfApiMergeModel)
+        [HttpPost("Extract")]
+        public ActionResult<byte[]> Extract([FromBody] MergeModel mergeModel)
         {
-            return PdfHandler.Extract(Convert.FromBase64String(pdfApiMergeModel.PdfSource), pdfApiMergeModel.PdfRange);
+            return PdfHandler.Extract(Convert.FromBase64String(mergeModel.Source), mergeModel.Range);
         }
 
-        [HttpPost("PdfRegex")]
-        public ActionResult<int[]> PdfRegex([FromBody] PdfApiRegexModel pdfApiRegexModel)
+        [HttpPost("Regex")]
+        public ActionResult<int[]> Regex([FromBody] RegexModel regexModel)
         {
-            return PdfHandler.Regex(Convert.FromBase64String(pdfApiRegexModel.PdfSource), pdfApiRegexModel.PdfPattern);
+            return PdfHandler.Regex(Convert.FromBase64String(regexModel.Source), regexModel.Pattern);
         }
 
 
-        [HttpPost("PdfTextExtract")]
-        public ActionResult<String> PdfTextExtract([FromBody] PdfApiTextExtract pdfApiTextExtract)
+        [HttpPost("TextExtract")]
+        public ActionResult<String> TextExtract([FromBody] TextExtractModel textExtract)
         {
-            return PdfHandler.ExtractText(Convert.FromBase64String(pdfApiTextExtract.PdfSource) );
+            return PdfHandler.ExtractText(Convert.FromBase64String(textExtract.Source) );
         }
 
         [HttpPost("GetNumberOfPages")]
-        public ActionResult<Int32> GetNumberOfPages([FromBody] String pdfSource)
+        public ActionResult<Int32> GetNumberOfPages([FromBody] String source)
         {
-            return PdfHandler.GetNumberOfPages(Convert.FromBase64String(pdfSource));
+            return PdfHandler.GetNumberOfPages(Convert.FromBase64String(source));
         }
 
     }

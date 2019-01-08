@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace ItextToRest.Models
 {
-    public class PdfApiTextExtract
+    public class MergeModel
     {
-        public String PdfSource { get; set; }
+        public String Source { get; set; }
+        public String Range { get; set; }
     }
 }
