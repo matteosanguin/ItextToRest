@@ -24,10 +24,16 @@ namespace ItextToRest.Controllers
             return PdfHandler.Extract(Convert.FromBase64String(mergeModel.Source), mergeModel.Range);
         }
 
-        [HttpPost("Regex")]
-        public ActionResult<int[]> Regex([FromBody] RegexModel regexModel)
+        [HttpPost("RegexAbsolute")]
+        public ActionResult<List<int>> RegexAbsolute([FromBody] RegexModel regexModel)
         {
-            return PdfHandler.Regex(Convert.FromBase64String(regexModel.Source), regexModel.Pattern);
+            return PdfHandler.RegexAbsolute(Convert.FromBase64String(regexModel.Source), regexModel.Pattern);
+        }
+
+        [HttpPost("RegexPaged")]
+        public ActionResult<List<RegexFound>> RegexPaged([FromBody] RegexModel regexModel)
+        {
+            return PdfHandler.RegexPaged(Convert.FromBase64String(regexModel.Source), regexModel.Pattern);
         }
 
 
@@ -35,6 +41,12 @@ namespace ItextToRest.Controllers
         public ActionResult<String> TextExtract([FromBody] TextExtractModel textExtract)
         {
             return PdfHandler.ExtractText(Convert.FromBase64String(textExtract.Source) );
+        }
+
+        [HttpPost("TextExtractPaged")]
+        public ActionResult<List<String>> TextExtractPaged([FromBody] TextExtractModel textExtract)
+        {
+            return PdfHandler.ExtractTextPaged(Convert.FromBase64String(textExtract.Source));
         }
 
         [HttpPost("GetNumberOfPages")]

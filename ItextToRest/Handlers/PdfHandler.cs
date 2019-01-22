@@ -3,6 +3,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using iText.Kernel.Utils;
 using ItextToRest.Extentions;
+using ItextToRest.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,14 +26,76 @@ namespace ItextToRest.Handlers
         /// <returns>An Array of rows where the seach pattern is in text extracted from the pdf </returns>
         public static int[] Regex(byte[] sourcePdf, String RegexPattern)
         {
-            var _textExtracted = ExtractText(sourcePdf);
-            if (_textExtracted != null )
+            return RegexAbsolute(sourcePdf, RegexPattern).ToArray();
+        }
+
+        /// <summary>
+        /// Search text inside pdf 
+        /// </summary>
+        /// <param name="sourcePdf">The Source in base64 string format </param>
+        /// <param name="RegexPattern">The Regex Pattern fro searching for </param>
+        /// <returns>An Array of rows where the seach pattern is in text extracted from the pdf </returns>
+        public static List<RegexFound> RegexPaged(byte[] sourcePdf, String RegexPattern )
+        {
+            List<RegexFound> _regexPaged = new List<RegexFound>();
+            var _textExtractedPaged = ExtractTextPaged(sourcePdf);
+            if (_textExtractedPaged != null && _textExtractedPaged.Any())
             {
-                Regex _rgx = new Regex(RegexPattern,RegexOptions.IgnoreCase | RegexOptions.Multiline);
-                return _rgx.Matches(_textExtracted).ToList().Select(x=>x.Index).ToArray();
+                var _pages = 0;
+                Regex _rgx = new Regex(RegexPattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                foreach (var _textExtracted in _textExtractedPaged)
+                {
+                    _pages++;
+
+                    foreach (var _match in _rgx.Matches(_textExtracted).ToList())
+                    {
+                        RegexFound _regexFound = new RegexFound();
+                        _regexFound.page = _pages;
+                        _regexFound.row = _match.Index;
+                        _regexFound.text = _match.Value;
+                        _regexPaged.Add(_regexFound);
+                    }
+                }
             }
 
-            return null;
+            return _regexPaged;
+        }
+
+
+        /// <summary>
+        /// Search text inside pdf 
+        /// </summary>
+        /// <param name="sourcePdf">The Source in base64 string format </param>
+        /// <param name="RegexPattern">The Regex Pattern fro searching for </param>
+        /// <returns>An Array of rows where the seach pattern is in text extracted from the pdf </returns>
+        public static List<int> RegexAbsolute(byte[] sourcePdf, String RegexPattern)
+        {
+            return RegexPaged(sourcePdf, RegexPattern).Select(x => x.row).ToList();
+        }
+
+
+        /// <summary>
+        /// Extract The Text Content From Pdf 
+        /// </summary>
+        /// <param name="sourcePdf">The Pdf in base64 string format</param>
+        /// <returns>A string of lines separated by \n </returns>
+        public static List<String> ExtractTextPaged(byte[] sourcePdf)
+        {
+            List<String> _textExtractedPaged = new List<string>();
+            using (PdfDocument _sourcePdfDocument = new PdfDocument(new PdfReader(new MemoryStream(sourcePdf))))
+            {
+                for (int i = 1; i < _sourcePdfDocument.GetNumberOfPages(); i++)
+                {
+                    FilteredEventListener listener = new FilteredEventListener();
+                    SimpleTextExtractionStrategy extractionStrategy = listener.AttachEventListener(new SimpleTextExtractionStrategy());
+                    new PdfCanvasProcessor(listener).ProcessPageContent(_sourcePdfDocument.GetPage(i));
+                    _textExtractedPaged.Add(extractionStrategy.GetResultantText());
+                }
+
+
+            }
+
+            return _textExtractedPaged;
         }
 
         /// <summary>
